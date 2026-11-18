@@ -242,7 +242,7 @@ PENDING_BUILDS: dict[str, tuple[frozenset[str], str, type[BaseException] | None]
         None,
     ),
     "e2e_tables": (
-        frozenset({"v0.113.0"}),
+        frozenset({"v0.113.0", "v0.113.1"}),
         "e2e static tables not generated for this build yet (GH #1303)",
         KeyError,
     ),

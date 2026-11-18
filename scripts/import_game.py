@@ -82,7 +82,7 @@ LOG = ROOT / "logs" / "import-game.log"
 # (sts2-rs/crates/sts2-workbench/data/game/<ver>/) — GH #801 — plus its display
 # tables: sts2-pycli/web/public/<ver>/{sfx_map,card_text}.json and
 # sts2-pycli/python/workbench/data/<ver>/card_db.json (GH #877).
-SUPPORTED_VERSIONS = ("v0.107.1", "v0.111.0", "v0.113.0")
+SUPPORTED_VERSIONS = ("v0.107.1", "v0.111.0", "v0.113.0", "v0.113.1")
 DEFAULT_VERSION = SUPPORTED_VERSIONS[0]
 
 TIERS = ["engine", "oracle", "workbench", "sound"]
@@ -102,11 +102,13 @@ DEPOT_MANIFESTS = {
     "v0.107.1": "4733892780027453168",
     "v0.111.0": "5661886308395090154",
     "v0.113.0": "5756684179086186957",
+    "v0.113.1": "8445808044584180628",
 }
 DEPOT_BRANCHES = {
     "v0.107.1": "public",
     "v0.111.0": "public-beta",
     "v0.113.0": "public-beta",
+    "v0.113.1": "public-beta",
 }
 # What the import reads from a build; the rest (the ~0.9 GB executable) is skipped.
 DOWNLOAD_FILES = [

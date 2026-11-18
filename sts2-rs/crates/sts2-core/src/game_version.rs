@@ -42,14 +42,20 @@ pub enum GameVersion {
     /// seeding as v0.111.0; content differences branch on `>= V0_113_0`.
     #[serde(rename = "v0.113.0")]
     V0_113_0,
+    /// v0.113.1 — the Steam `public-beta` build (commit `d09d48e5`). Same
+    /// seeding as v0.113.0; the one combat change (Stretch counts an
+    /// Adroit-enchanted card as gaining Block) branches on `>= V0_113_1`.
+    #[serde(rename = "v0.113.1")]
+    V0_113_1,
 }
 
 impl GameVersion {
     /// Every supported build, oldest first.
-    pub const ALL: [GameVersion; 3] = [
+    pub const ALL: [GameVersion; 4] = [
         GameVersion::V0_107_1,
         GameVersion::V0_111_0,
         GameVersion::V0_113_0,
+        GameVersion::V0_113_1,
     ];
 
     /// The canonical `vX.Y.Z` spelling (what [`fmt::Display`] prints).
@@ -59,6 +65,7 @@ impl GameVersion {
             GameVersion::V0_107_1 => "v0.107.1",
             GameVersion::V0_111_0 => "v0.111.0",
             GameVersion::V0_113_0 => "v0.113.0",
+            GameVersion::V0_113_1 => "v0.113.1",
         }
     }
 
@@ -112,7 +119,7 @@ impl GameVersion {
             GameVersion::V0_107_1 => {
                 u64::from(crate::dotnet_rng::deterministic_hash_code(text) as u32)
             }
-            GameVersion::V0_111_0 | GameVersion::V0_113_0 => {
+            GameVersion::V0_111_0 | GameVersion::V0_113_0 | GameVersion::V0_113_1 => {
                 xxhash_rust::xxh64::xxh64(text.as_bytes(), 0)
             }
         }
@@ -138,7 +145,9 @@ impl GameVersion {
     pub fn run_seed_hash(self, seed: &str) -> u64 {
         match self {
             GameVersion::V0_107_1 => self.seed_hash(seed),
-            GameVersion::V0_111_0 | GameVersion::V0_113_0 => match seed.strip_prefix("old") {
+            GameVersion::V0_111_0 | GameVersion::V0_113_0 | GameVersion::V0_113_1 => match seed
+                .strip_prefix("old")
+            {
                 Some(rest) => u64::from(crate::dotnet_rng::deterministic_hash_code(rest) as u32),
                 None => self.seed_hash(seed),
             },
@@ -170,7 +179,9 @@ impl GameVersion {
     pub fn seed_add(self, a: u64, b: u64) -> u64 {
         match self {
             GameVersion::V0_107_1 => u64::from((a as u32).wrapping_add(b as u32)),
-            GameVersion::V0_111_0 | GameVersion::V0_113_0 => a.wrapping_add(b),
+            GameVersion::V0_111_0 | GameVersion::V0_113_0 | GameVersion::V0_113_1 => {
+                a.wrapping_add(b)
+            }
         }
     }
 
@@ -205,7 +216,7 @@ impl GameVersion {
     pub fn normalize_seed(self, seed: u64) -> u64 {
         match self {
             GameVersion::V0_107_1 => u64::from(seed as u32),
-            GameVersion::V0_111_0 | GameVersion::V0_113_0 => seed,
+            GameVersion::V0_111_0 | GameVersion::V0_113_0 | GameVersion::V0_113_1 => seed,
         }
     }
 }
@@ -236,6 +247,7 @@ impl FromStr for GameVersion {
             "0.107.1" => Ok(GameVersion::V0_107_1),
             "0.111.0" => Ok(GameVersion::V0_111_0),
             "0.113.0" => Ok(GameVersion::V0_113_0),
+            "0.113.1" => Ok(GameVersion::V0_113_1),
             _ => Err(ParseGameVersionError(s.to_string())),
         }
     }

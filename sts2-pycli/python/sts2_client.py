@@ -42,7 +42,7 @@ DEFAULT_GAME_VERSION = "v0.111.0"
 #: New files always name their build, so nothing new depends on this.
 LEGACY_GAME_VERSION = "v0.107.1"
 #: Every build the oracle can be compiled for (mirrors the csproj check).
-SUPPORTED_GAME_VERSIONS: tuple[str, ...] = ("v0.107.1", "v0.111.0", "v0.113.0")
+SUPPORTED_GAME_VERSIONS: tuple[str, ...] = ("v0.107.1", "v0.111.0", "v0.113.0", "v0.113.1")
 #: Steam beta builds whose content the engine has only partly ported: the
 #: advisor answers on them, and labels the answer approximate (GH #1303).
 #: Empty since v0.113.0's port landed (#1319 run level, #1330 The Fool's cards).

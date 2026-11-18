@@ -33,6 +33,10 @@ _VER_NUMS = re.compile(r"\d+")
 # The build list itself lives in ``sts2_client`` (one list for the oracle and
 # the workbench); every build's wiki dir is named after the build.
 _ENGINE_WIKI_VERSIONS: dict[str, str] = {v: v for v in SUPPORTED_GAME_VERSIONS}
+# v0.113.1 changed no card, relic or power data or text (only epoch blurbs): it
+# reuses v0.113.0's wiki data and bundle (mirrors
+# sts2_workbench::data::engine_wiki_version).
+_ENGINE_WIKI_VERSIONS["v0.113.1"] = "v0.113.0"
 # The default build's wiki dir. Kept under its historical name: scripts
 # (``bundle_workbench_data.py``, ``synergy.gen_card_text``) and tests import it.
 _ENGINE_WIKI_VERSION = _ENGINE_WIKI_VERSIONS[LEGACY_GAME_VERSION]

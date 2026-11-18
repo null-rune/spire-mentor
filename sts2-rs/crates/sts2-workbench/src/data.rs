@@ -61,7 +61,9 @@ pub const fn engine_wiki_version(version: GameVersion) -> &'static str {
     match version {
         GameVersion::V0_107_1 => ENGINE_WIKI_VERSION,
         GameVersion::V0_111_0 => "v0.111.0",
-        GameVersion::V0_113_0 => "v0.113.0",
+        // v0.113.1 changed no card, relic or power data or text (only epoch blurbs): it reuses
+        // v0.113.0's bundle.
+        GameVersion::V0_113_0 | GameVersion::V0_113_1 => "v0.113.0",
     }
 }
 
@@ -259,7 +261,7 @@ macro_rules! bundled {
             GameVersion::V0_111_0 => {
                 include_str!(concat!(env!("OUT_DIR"), "/game/v0.111.0/", $name))
             }
-            GameVersion::V0_113_0 => {
+            GameVersion::V0_113_0 | GameVersion::V0_113_1 => {
                 include_str!(concat!(env!("OUT_DIR"), "/game/v0.113.0/", $name))
             }
         };
@@ -374,7 +376,7 @@ impl Data {
                     GameVersion::V0_111_0 => {
                         include_str!(concat!(env!("OUT_DIR"), "/game/v0.111.0/card_tags.json"))
                     }
-                    GameVersion::V0_113_0 => {
+                    GameVersion::V0_113_0 | GameVersion::V0_113_1 => {
                         include_str!(concat!(env!("OUT_DIR"), "/game/v0.113.0/card_tags.json"))
                     }
                 };
@@ -434,7 +436,7 @@ pub fn embedded_versions() -> Vec<GameVersion> {
     let complete: Vec<&str> = env!("WORKBENCH_EMBEDDED_VERSIONS").split(',').collect();
     GameVersion::ALL
         .into_iter()
-        .filter(|v| v.is_default() || complete.contains(&v.as_str()))
+        .filter(|v| v.is_default() || complete.contains(&engine_wiki_version(*v)))
         .collect()
 }
 
@@ -442,16 +444,18 @@ pub fn embedded_versions() -> Vec<GameVersion> {
 mod tests {
     use super::*;
 
-    /// `build.rs`'s `VERSIONED` is every non-default `GameVersion`: a build
+    /// `build.rs`'s `VERSIONED` is every non-default bundle a `GameVersion`
+    /// reads ([`engine_wiki_version`]; v0.113.1 shares v0.113.0's): a bundle
     /// missing there is never staged, one extra is staged for nothing.
     #[test]
     fn build_script_versions_match_game_version_all() {
         let staged: Vec<&str> = env!("WORKBENCH_VERSIONED").split(',').collect();
-        let expected: Vec<&str> = GameVersion::ALL
+        let mut expected: Vec<&str> = GameVersion::ALL
             .into_iter()
             .filter(|v| !v.is_default())
-            .map(GameVersion::as_str)
+            .map(engine_wiki_version)
             .collect();
+        expected.dedup();
         assert_eq!(staged, expected);
     }
 
@@ -492,7 +496,11 @@ mod tests {
         );
         assert_eq!(engine_wiki_version(GameVersion::V0_111_0), "v0.111.0");
         for v in GameVersion::ALL {
-            assert_eq!(engine_wiki_version(v), v.as_str());
+            let want = match v {
+                GameVersion::V0_113_1 => "v0.113.0",
+                _ => v.as_str(),
+            };
+            assert_eq!(engine_wiki_version(v), want);
         }
     }
 

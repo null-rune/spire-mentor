@@ -169,7 +169,7 @@ regression-test: build-cs
 # is NOT in the per-PR gate any more (2026-11-14): run `just test-107` on
 # demand, or `just gate-full` from the repo root. A game version that ships is
 # an entry here; a build outside the gate rots silently.
-gate_builds := "v0.111.0 v0.113.0"
+gate_builds := "v0.111.0 v0.113.0 v0.113.1"
 
 # How many seeds the full-run parity sweeps walk in the per-PR gate
 # (`PARITY_SEEDS`; the full sweep, `just test-slow`, is 20).

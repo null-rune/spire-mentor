@@ -73,8 +73,9 @@ fn capabilities_list_the_supported_builds() {
     let mut want = vec!["v0.107.1"];
     #[cfg(workbench_game_data_v0_111_0)]
     want.push("v0.111.0");
+    // v0.113.1 reads v0.113.0's bundle, so it is offered alongside it.
     #[cfg(workbench_game_data_v0_113_0)]
-    want.push("v0.113.0");
+    want.extend(["v0.113.0", "v0.113.1"]);
     assert_eq!(caps["game_versions"], json!(want));
     // A new run starts on the new-run default when its bundle is embedded.
     let default = if cfg!(workbench_game_data_v0_111_0) {

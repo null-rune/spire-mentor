@@ -18,10 +18,12 @@ _WIKI_DATA = _REPO.parent / "sts2-wiki" / "data"
 
 def test_engine_wiki_version_maps_every_supported_build():
     assert localization.LEGACY_GAME_VERSION == "v0.107.1"
-    assert localization.SUPPORTED_GAME_VERSIONS == ("v0.107.1", "v0.111.0", "v0.113.0")
+    assert localization.SUPPORTED_GAME_VERSIONS == ("v0.107.1", "v0.111.0", "v0.113.0", "v0.113.1")
     assert localization.engine_wiki_version() == localization._ENGINE_WIKI_VERSION
+    # v0.113.1 reads v0.113.0's wiki data (no card, relic or power changes).
+    shared = {"v0.113.1": "v0.113.0"}
     for v in localization.SUPPORTED_GAME_VERSIONS:
-        assert localization.engine_wiki_version(v) == v
+        assert localization.engine_wiki_version(v) == shared.get(v, v)
     with pytest.raises(ValueError, match=r"v0\.107\.1, v0\.111\.0"):
         localization.engine_wiki_version("v0.99.1")
 

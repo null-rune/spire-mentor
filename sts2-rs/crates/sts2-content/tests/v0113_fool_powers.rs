@@ -597,3 +597,26 @@ fn wah_hammer_doubles_strength_too() {
     play(&mut s, CardId::WahHammer, false, Some(0));
     assert_eq!(hp - enemy_hp(&s), (9 + 3) * 2);
 }
+
+/// v0.113.1 `StretchPower.GainsBlock`: a card enchanted with Adroit
+/// (`Adroit.GainsBlock => true`) counts as gaining Block even when the card
+/// itself does not, so Stretch latches on it, adds its bonus to Adroit's
+/// block and is spent. v0.113.0 ignored the enchantment.
+#[test]
+fn stretch_counts_adroit_from_v0_113_1() {
+    for (version, block, stretch_left) in [(V113, 3, 6), (GameVersion::V0_113_1, 3 + 6, 0)] {
+        let mut s = fresh(version, CharacterId::Fool);
+        s.player.energy = 10;
+        add_player_power(&mut s, 95, PowerKind::Stretch, 6);
+        let i = push_hand(&mut s, CardId::StrikeIronclad, false);
+        let uid = s.player.hand[i as usize];
+        s.cards[uid.get() as usize - 1].set_enchantment(sts2_core::cards::EnchantmentId::Adroit, 3);
+        let _ = sts2_core::combat_loop::play_card(&mut s, i, Some(0));
+        assert_eq!(s.player.block, block, "{version}");
+        assert_eq!(
+            player_power(&s, PowerKind::Stretch),
+            stretch_left,
+            "{version}"
+        );
+    }
+}

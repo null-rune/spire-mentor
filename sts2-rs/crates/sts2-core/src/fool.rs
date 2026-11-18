@@ -1156,6 +1156,20 @@ pub fn encore_blocks(state: &CombatState) -> bool {
 
 // ── StretchPower ───────────────────────────────────────────────────────
 
+/// `StretchPower.GainsBlock(card)`: whether Stretch counts `card` as a
+/// block card. v0.113.1 (`StretchPower.cs` `GainsBlock`, with
+/// `EnchantmentModel.GainsBlock` / `Adroit.cs`) also counts a card whose
+/// enchantment gains Block, which among the enchantments is only Adroit;
+/// earlier builds read `CardModel.GainsBlock` alone.
+fn stretch_counts_card(state: &CombatState, card: CardUid) -> bool {
+    let version = state.game_version;
+    state.cards.get(card.0.get() as usize - 1).is_some_and(|c| {
+        c.gains_block_for(version)
+            || (version >= crate::GameVersion::V0_113_1
+                && c.has_enchantment(crate::cards::EnchantmentId::Adroit))
+    })
+}
+
 /// `StretchPower.BeforeCardPlayed`: an owned card that `GainsBlock` latches
 /// the play and the Stretch amount when it started (first latch wins).
 pub fn latch_stretch_at_play_start(state: &mut CombatState, card: CardUid) {
@@ -1166,12 +1180,7 @@ pub fn latch_stretch_at_play_start(state: &mut CombatState, card: CardUid) {
     if amount <= 0 {
         return;
     }
-    let version = state.game_version;
-    let gains_block = state
-        .cards
-        .get(card.0.get() as usize - 1)
-        .is_some_and(|c| c.gains_block_for(version));
-    if gains_block {
+    if stretch_counts_card(state, card) {
         fool_mut(state).stretch_latch = Some((card, amount, false));
     }
 }
@@ -1209,10 +1218,16 @@ pub fn stretch_block_bonus(
 /// itself; `Some` is a clone where `card` stands in as the latched play, so
 /// the shared bonus yields `Amount` — cloned only when Stretch is held and
 /// nothing is latched.
+///
+/// v0.113.1 previews the bonus only on a card Stretch counts
+/// (`GainsBlock(cardSource) ? Amount : 0`); earlier builds on every card.
 #[must_use]
 pub fn stretch_preview_state(state: &CombatState, card: CardUid) -> Option<CombatState> {
     let amount = state.player_power_amount(PowerKind::Stretch);
     if amount <= 0 || fool(state).is_some_and(|f| f.stretch_latch.is_some()) {
+        return None;
+    }
+    if state.game_version >= crate::GameVersion::V0_113_1 && !stretch_counts_card(state, card) {
         return None;
     }
     let mut staged = state.clone();

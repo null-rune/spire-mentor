@@ -26,6 +26,7 @@ const LABELS: Record<string, string> = {
   "v0.107.1": "game v0.107.1 (stable)",
   "v0.111.0": "v0.111.0 (beta)",
   "v0.113.0": "v0.113.0 (beta, + the Fool)",
+  "v0.113.1": "v0.113.1 (beta, + the Fool)",
 };
 
 export function gameVersionLabel(v: string): string {

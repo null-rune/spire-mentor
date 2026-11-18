@@ -273,7 +273,7 @@ impl AssetResolver {
         let cell = match version {
             GameVersion::V0_107_1 => &V0_107_1,
             GameVersion::V0_111_0 => &V0_111_0,
-            GameVersion::V0_113_0 => &V0_113_0,
+            GameVersion::V0_113_0 | GameVersion::V0_113_1 => &V0_113_0,
         };
         cell.get_or_init(|| {
             let d = data::data_for(version);

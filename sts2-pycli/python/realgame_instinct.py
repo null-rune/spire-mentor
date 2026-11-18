@@ -71,7 +71,7 @@ INSTINCT_GAME_VERSION = "v0.111.0"
 #: The live builds Instinct answers for. The student plays each on that
 #: build's own rules (:func:`engine_game_version`), as it already did in a
 #: fight: the fight mirror always ran the live build.
-INSTINCT_GAME_VERSIONS: tuple[str, ...] = ("v0.111.0", "v0.113.0")
+INSTINCT_GAME_VERSIONS: tuple[str, ...] = ("v0.111.0", "v0.113.0", "v0.113.1")
 
 
 def engine_game_version(state: dict[str, Any]) -> str:
